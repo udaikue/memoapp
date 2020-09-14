@@ -1,0 +1,74 @@
+body {
+  background: #fff0f5;
+  color: #696969;
+  font-family: 'Avenir','Helvetica Neue','Helvetica','Arial','Hiragino Sans','ヒラギノ角ゴシック',YuGothic,'Yu Gothic','メイリオ', Meiryo,'ＭＳ Ｐゴシック','MS PGothic'
+}
+
+a {
+  text-decoration: none;
+}
+
+h1 {
+  text-align: center;
+}
+
+/* マウスオンでのみリンク色を変える */
+a:link, a:visited, a:active {
+  color: #696969;
+}
+a:hover {
+  color:#808080;
+}
+
+form{
+  width:300px;
+  margin:0 auto;
+}
+.item{
+  overflow: hidden;
+  margin-bottom: 30px;
+}
+.label{
+  float: left;
+  width:90px;
+  border-left: solid 3px #f08080;
+  padding-left: 10px;
+}
+.inputs{
+  float: left;
+  width:260px;
+}
+input[type="text"]{
+  border: solid 1px #aaa;
+  border-radius:5px;
+  padding:10px;
+  font-size: 15px;
+}
+textarea{
+  border: solid 1px #aaa;
+  border-radius:5px;
+  padding: 10px;
+  height: 160px;
+  font-size: 15px;
+}
+.btn-area{
+  text-align: center;
+}
+input[type="submit"]{
+  background: #f08080;
+  border: none;
+  color: white;
+  font-size:16px;
+  border-radius:5px;
+  padding: 10px 20px;
+  margin: 0 5px;
+}
+input[type="reset"]{
+  background: #f08080;
+  border: none;
+  color: white;
+  font-size:16px;
+  border-radius:5px;
+  padding: 10px 20px;
+  margin: 0 5px;
+}

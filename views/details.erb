@@ -1,0 +1,15 @@
+<form method="post" action="delete">
+  <input type="hidden" name="_method" value="delete">
+  <% @json_data['memos'].each do |js| %>
+    <% if js['id'] == @id.to_i %>
+      <% @title = js['title'] %>
+      <% @content = js['content'].gsub(/\r\n/, '<br>')  %>
+      <h2><%= @title %></h2>
+      <p><%= @content %></p>
+    <% end %>
+  <% end %>
+
+  <div class="btn-area">
+    <input type="reset" value="編集" onclick="location.href='edit'"><input type="submit" value="削除">
+  </div>
+</form>
