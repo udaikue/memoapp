@@ -1,4 +1,4 @@
-<form method="post" action="delete">
+<form method="post" action="<%= @id %>/delete">
   <input type="hidden" name="_method" value="delete">
   <% @json_data['memos'].each do |js| %>
     <% if js['id'] == @id.to_i %>
@@ -10,6 +10,6 @@
   <% end %>
 
   <div class="btn-area">
-    <input type="reset" value="編集" onclick="location.href='edit'"><input type="submit" value="削除">
+    <input type="reset" value="編集" onclick="location.href='<%= @id %>/edit'"><input type="submit" value="削除">
   </div>
 </form>

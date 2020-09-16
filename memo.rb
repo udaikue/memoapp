@@ -10,7 +10,7 @@ class Memo
   def initialize(new_json)
     @new_json = new_json
   end
-
+  
   # jsonファイルを読み込む
   def self.read
     open('memos/memos.json') do |f|
@@ -23,6 +23,11 @@ class Memo
     File.open('memos/memos.json', 'w') do |f|
       JSON.dump(@new_json, f)
     end
+  end
+
+  # 空のjsonデータをセットする
+  def self.empty_add
+    @new_json = { 'memos' => [] }
   end
 
   # 追加を反映させたjsonデータをセットする
@@ -45,9 +50,9 @@ end
 
 get '/memos/?' do
   # 保存用のjsonファイルが存在しなければファイルを作成する
-  if File.exist?('memos/memos.json') == false
-    new_json = { 'memos' => [] }
-    Memo.write(new_json)
+  unless File.exist?('memos/memos.json')
+    Memo.empty_add
+    Memo.write
   end
   @json_data = Memo.read
   erb :memos
@@ -69,7 +74,7 @@ post '/memos' do
   redirect '/memos'
 end
 
-get '/memos/:id/details' do
+get '/memos/:id' do
   @id = params[:id].delete(':')
   @json_data = Memo.read
   erb :details

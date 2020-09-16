@@ -1,6 +1,6 @@
 <form method="get" action="new">
   <p><% @json_data['memos'].reverse_each do |js| %>
-  <p><a href="/memos/:<%= js['id'] %>/details"><%= js['title'] %></a></p>
+  <p><a href="/memos/:<%= js['id'] %>"><%= js['title'] %></a></p>
 <% end %>
   </p>
 
