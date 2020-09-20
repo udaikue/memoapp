@@ -1,12 +1,8 @@
 <form method="post" action="<%= @id %>/delete">
   <input type="hidden" name="_method" value="delete">
-  <% @json_data['memos'].each do |js| %>
-    <% if js['id'] == @id.to_i %>
-      <% @title = js['title'] %>
-      <% @content = js['content'].gsub(/\r\n/, '<br>')  %>
-      <h2><%= @title %></h2>
-      <p><%= @content %></p>
-    <% end %>
+  <% @results.each do |r| %>
+    <h2><%= r['title'] %></h2>
+    <p><%= r['content'].gsub(/\r/, '<br>') %></p>
   <% end %>
 
   <div class="btn-area">

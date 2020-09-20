@@ -5,42 +5,47 @@ require 'sinatra/reloader'
 require 'json'
 require 'securerandom'
 require 'date'
+require 'pg'
+require 'dotenv/load'
 
 class Memo
-  def initialize(new_json)
-    @new_json = new_json
-  end
-  
-  # jsonファイルを読み込む
-  def self.read
-    open('memos/memos.json') do |f|
-      JSON.load(f)
-    end
+  def initialize(connection)
+    @connection = connection
   end
 
-  # jsonファイルを書き込む
-  def self.write
-    File.open('memos/memos.json', 'w') do |f|
-      JSON.dump(@new_json, f)
-    end
+  # DBに接続する
+  def self.connect_db
+    @connection = PG.connect(
+      host: ENV['DB_HOST'],
+      user: ENV['DB_USER'],
+      password: ENV['DB_PASSWORD'],
+      dbname: ENV['DB_NAME']
+    )
   end
 
-  # 空のjsonデータをセットする
-  def self.empty_add
-    @new_json = { 'memos' => [] }
+  # Memosテーブルを検索し更新時間順に並べる
+  def self.select_all
+    @connection.exec('SELECT id, title FROM Memos ORDER BY update_at DESC;')
   end
 
-  # 追加を反映させたjsonデータをセットする
-  def self.fetch_add(id, title, content, time_str, old_json)
-    add_memo = { id: id, title: title, content: content, update: time_str.to_i }
-    ary_memo = old_json['memos'].push(add_memo)
-    @new_json = { 'memos' => ary_memo }
+  # idが一致する行を検索する
+  def self.select_where_id(id)
+    @connection.exec("SELECT id, title, content FROM Memos WHERE id = #{id};")
   end
 
-  # 削除を反映させたjsonデータをセットする
-  def self.fetch_delete(id, old_json)
-    del_ary = old_json['memos'].delete_if { |a| a['id'] == id.to_i }
-    @new_json = { 'memos' => del_ary }
+  # 入力されたデータを挿入する
+  def self.insert(title, content)
+    @connection.exec("INSERT INTO Memos (title, content, update_at) VALUES ('#{title}', '#{content}', current_timestamp);")
+  end
+
+  # idが一致する行を削除する
+  def self.delete(id)
+    @connection.exec("DELETE FROM Memos WHERE id = #{id};")
+  end
+
+  # DBとの接続を解除する
+  def self.disconnect_db
+    @connection.finish
   end
 end
 
@@ -49,12 +54,12 @@ get '/' do
 end
 
 get '/memos/?' do
-  # 保存用のjsonファイルが存在しなければファイルを作成する
-  unless File.exist?('memos/memos.json')
-    Memo.empty_add
-    Memo.write
+  Memo.connect_db
+  begin
+    @results = Memo.select_all
+  ensure
+    Memo.disconnect_db
   end
-  @json_data = Memo.read
   erb :memos
 end
 
@@ -63,57 +68,63 @@ get '/new' do
 end
 
 post '/memos' do
-  old_json = Memo.read
-  id = SecureRandom.random_number(999999999)
   title = params[:memo_title]
   content = params[:memo_content]
-  time_str = Time.now.strftime('%Y%m%d%H%M%S')
-  Memo.fetch_add(id, title, content, time_str, old_json)
-  Memo.write
-
+  Memo.connect_db
+  begin
+    Memo.insert(title, content)
+  ensure
+    Memo.disconnect_db
+  end
   redirect '/memos'
 end
 
 get '/memos/:id' do
-  @id = params[:id].delete(':')
-  @json_data = Memo.read
+  id = params[:id].delete(':').to_i
+  Memo.connect_db
+  begin
+    @results = Memo.select_where_id(id)
+  ensure
+    Memo.disconnect_db
+  end
+
+  @id = id
   erb :details
 end
 
 delete '/memos/:id/delete' do
-  id = params[:id].delete(':')
-  old_json = Memo.read
-  Memo.fetch_delete(id, old_json)
-  Memo.write
-
+  id = params[:id].delete(':').to_i
+  Memo.connect_db
+  begin
+    Memo.delete(id)
+  ensure
+    Memo.disconnect_db
+  end
   redirect '/memos'
 end
 
 get '/memos/:id/edit' do
-  id = params[:id].delete(':')
-  json_data = Memo.read
-  json_data['memos'].each do |js|
-    if js['id'] == id.to_i
-      @title = js['title']
-      @content = js['content']
-    end
+  id = params[:id].delete(':').to_i
+  Memo.connect_db
+  begin
+    @results = Memo.select_where_id(id)
+  ensure
+    Memo.disconnect_db
   end
   erb :edit
 end
 
 patch '/memos/:id/edit' do
   id = params[:id].delete(':')
-  old_json = Memo.read
-  Memo.fetch_delete(id, old_json)
-  Memo.write
-
-  old_json = Memo.read
-  id = SecureRandom.random_number(999999999)
   title = params[:memo_title]
   content = params[:memo_content]
-  time_str = Time.now.strftime('%Y%m%d%H%M%S')
-  Memo.fetch_add(id, title, content, time_str, old_json)
-  Memo.write
+  Memo.connect_db
 
+  begin
+    Memo.delete(id)
+    Memo.insert(title, content)
+  ensure
+    Memo.disconnect_db
+  end
   redirect '/memos'
 end

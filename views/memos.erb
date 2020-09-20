@@ -1,8 +1,7 @@
 <form method="get" action="new">
-  <p><% @json_data['memos'].reverse_each do |js| %>
-  <p><a href="/memos/:<%= js['id'] %>"><%= js['title'] %></a></p>
+  <% @results.each do |r| %>
+  <p><a href="/memos/:<%= r['id'] %>"><%= r['title'] %></a></p>
 <% end %>
-  </p>
 
   <div class="btn-area">
     <input type="submit" value="作成">
