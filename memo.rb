@@ -24,12 +24,12 @@ class Memo
   end
 
   # Memosテーブルを検索し更新時間順に並べる
-  def self.select_all
+  def self.all
     @connection.exec('SELECT id, title FROM Memos ORDER BY update_at DESC;')
   end
 
   # idが一致する行を検索する
-  def self.select_where_id(id)
+  def self.fetch(id)
     @connection.exec("SELECT id, title, content FROM Memos WHERE id = #{id};")
   end
 
@@ -56,7 +56,7 @@ end
 get '/memos/?' do
   Memo.connect_db
   begin
-    @results = Memo.select_all
+    @results = Memo.all
   ensure
     Memo.disconnect_db
   end
@@ -83,7 +83,7 @@ get '/memos/:id' do
   id = params[:id].delete(':').to_i
   Memo.connect_db
   begin
-    @results = Memo.select_where_id(id)
+    @results = Memo.fetch(id)
   ensure
     Memo.disconnect_db
   end
@@ -107,7 +107,7 @@ get '/memos/:id/edit' do
   id = params[:id].delete(':').to_i
   Memo.connect_db
   begin
-    @results = Memo.select_where_id(id)
+    @results = Memo.fetch(id)
   ensure
     Memo.disconnect_db
   end
