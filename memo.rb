@@ -56,7 +56,7 @@ end
 get '/memos/?' do
   Memo.connect_db
   begin
-    @results = Memo.all
+    @memos = Memo.all
   ensure
     Memo.disconnect_db
   end
@@ -83,7 +83,7 @@ get '/memos/:id' do
   id = params[:id].delete(':').to_i
   Memo.connect_db
   begin
-    @results = Memo.fetch(id)
+    @memos = Memo.fetch(id)
   ensure
     Memo.disconnect_db
   end
@@ -107,7 +107,7 @@ get '/memos/:id/edit' do
   id = params[:id].delete(':').to_i
   Memo.connect_db
   begin
-    @results = Memo.fetch(id)
+    @memos = Memo.fetch(id)
   ensure
     Memo.disconnect_db
   end

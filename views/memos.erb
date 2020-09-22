@@ -1,5 +1,5 @@
 <form method="get" action="new">
-  <% @results.each do |r| %>
+  <% @memos.each do |r| %>
   <p><a href="/memos/:<%= r['id'] %>"><%= r['title'] %></a></p>
 <% end %>
 
