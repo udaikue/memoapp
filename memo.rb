@@ -84,7 +84,6 @@ get '/memos/:id' do
     Memo.disconnect_db
   end
 
-  @id = id
   erb :details
 end
 
