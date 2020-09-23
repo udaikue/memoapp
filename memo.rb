@@ -9,10 +9,6 @@ require 'pg'
 require 'dotenv/load'
 
 class Memo
-  def initialize(connection)
-    @connection = connection
-  end
-
   # DBに接続する
   def self.connect_db
     @connection = PG.connect(
