@@ -76,10 +76,10 @@ post '/memos' do
 end
 
 get '/memos/:id' do
-  id = params[:id].delete(':').to_i
+  @id = params[:id].delete(':').to_i
   Memo.connect_db
   begin
-    @memos = Memo.fetch(id)
+    @memos = Memo.fetch(@id)
   ensure
     Memo.disconnect_db
   end
