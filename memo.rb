@@ -21,21 +21,25 @@ class Memo
 
   # Memosテーブルを検索し更新時間順に並べる
   def self.all
+    connect_db
     @connection.exec('SELECT id, title FROM Memos ORDER BY update_at DESC;')
   end
 
   # idが一致する行を検索する
   def self.fetch(id)
+    connect_db
     @connection.exec("SELECT id, title, content FROM Memos WHERE id = #{id};")
   end
 
   # 入力されたデータを挿入する
   def self.insert(title, content)
+    connect_db
     @connection.exec("INSERT INTO Memos (title, content, update_at) VALUES ('#{title}', '#{content}', current_timestamp);")
   end
 
   # idが一致する行を削除する
   def self.delete(id)
+    connect_db
     @connection.exec("DELETE FROM Memos WHERE id = #{id};")
   end
 
@@ -50,7 +54,6 @@ get '/' do
 end
 
 get '/memos/?' do
-  Memo.connect_db
   begin
     @memos = Memo.all
   ensure
@@ -66,7 +69,6 @@ end
 post '/memos' do
   title = params[:memo_title]
   content = params[:memo_content]
-  Memo.connect_db
   begin
     Memo.insert(title, content)
   ensure
@@ -77,19 +79,16 @@ end
 
 get '/memos/:id' do
   @id = params[:id].delete(':').to_i
-  Memo.connect_db
   begin
     @memos = Memo.fetch(@id)
   ensure
     Memo.disconnect_db
   end
-
   erb :details
 end
 
 delete '/memos/:id/delete' do
   id = params[:id].delete(':').to_i
-  Memo.connect_db
   begin
     Memo.delete(id)
   ensure
@@ -100,7 +99,6 @@ end
 
 get '/memos/:id/edit' do
   id = params[:id].delete(':').to_i
-  Memo.connect_db
   begin
     @memos = Memo.fetch(id)
   ensure
@@ -113,7 +111,6 @@ patch '/memos/:id/edit' do
   id = params[:id].delete(':')
   title = params[:memo_title]
   content = params[:memo_content]
-  Memo.connect_db
 
   begin
     Memo.delete(id)
