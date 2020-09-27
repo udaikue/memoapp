@@ -2,13 +2,11 @@
   <input type="hidden" name="_method" value="patch">
   <div class="item">
     <label class="label">タイトル</label>
-    <input class="inputs" type="text" name="memo_title" required="required" value=<% @memos.each do |r| %>
-    <%= r['title'] %>
-  <% end %>>
+    <input class="inputs" type="text" name="memo_title" required="required" value=<%= @title %>>
   </div>
   <div class="item">
     <label class="label">内容</label>
-    <textarea class="inputs" name="memo_content"><% @memos.each do |r| %><%= r['content'] %><% end %></textarea>
+    <textarea class="inputs" name="memo_content"><%= @content %></textarea>
   </div>
 
   <div class="btn-area">

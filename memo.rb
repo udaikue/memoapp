@@ -100,7 +100,9 @@ end
 get '/memos/:id/edit' do
   id = params[:id].delete(':').to_i
   begin
-    @memos = Memo.fetch(id)
+    memos = Memo.fetch(id)
+    @title = memos.first['title']
+    @content = memos.first['content']
   ensure
     Memo.disconnect_db
   end
