@@ -1,6 +1,6 @@
 <form method="get" action="new">
-  <% @memos.each do |r| %>
-  <p><a href="/memos/:<%= r['id'] %>"><%= r['title'] %></a></p>
+  <% @memos.each do |m| %>
+  <p><a href="/memos/<%= m['id'] %>"><%= m['title'] %></a></p>
 <% end %>
 
   <div class="btn-area">

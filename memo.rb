@@ -78,7 +78,7 @@ post '/memos' do
 end
 
 get '/memos/:id' do
-  @id = params[:id].delete(':').to_i
+  @id = params[:id]
   begin
     @memos = Memo.fetch(@id)
   ensure
@@ -88,7 +88,7 @@ get '/memos/:id' do
 end
 
 delete '/memos/:id/delete' do
-  id = params[:id].delete(':').to_i
+  id = params[:id]
   begin
     Memo.delete(id)
   ensure
@@ -98,7 +98,7 @@ delete '/memos/:id/delete' do
 end
 
 get '/memos/:id/edit' do
-  id = params[:id].delete(':').to_i
+  id = params[:id]
   begin
     memos = Memo.fetch(id)
     @title = memos.first['title']
@@ -110,7 +110,7 @@ get '/memos/:id/edit' do
 end
 
 patch '/memos/:id/edit' do
-  id = params[:id].delete(':')
+  id = params[:id]
   title = params[:memo_title]
   content = params[:memo_content]
 
