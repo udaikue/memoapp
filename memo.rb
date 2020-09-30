@@ -31,10 +31,10 @@ class Memo
     @connection.exec("SELECT id, title, content FROM Memos WHERE id = #{id};")
   end
 
-  # 入力されたデータを挿入する
-  def self.insert(title, content)
+  # データを更新する
+  def self.update(id, title, content)
     connect_db
-    @connection.exec("INSERT INTO Memos (title, content, update_at) VALUES ('#{title}', '#{content}', current_timestamp);")
+    @connection.exec("UPDATE Memos SET title = '#{title}', content = '#{content}', update_at = current_timestamp WHERE id = #{id};")
   end
 
   # idが一致する行を削除する
@@ -115,8 +115,7 @@ patch '/memos/:id/edit' do
   content = params[:memo_content]
 
   begin
-    Memo.delete(id)
-    Memo.insert(title, content)
+    Memo.update(id, title, content)
   ensure
     Memo.disconnect_db
   end
