@@ -4,11 +4,16 @@ body {
   font-family: 'Avenir','Helvetica Neue','Helvetica','Arial','Hiragino Sans','ヒラギノ角ゴシック',YuGothic,'Yu Gothic','メイリオ', Meiryo,'ＭＳ Ｐゴシック','MS PGothic'
 }
 
-a {
-  text-decoration: none;
+h1 {
+  text-align: center;
 }
 
-h1 {
+p {
+  white-space: pre-line;
+}
+
+a {
+  text-decoration: none;
   text-align: center;
 }
 

@@ -1,8 +1,9 @@
 <form method="post" action="<%= @id %>/delete">
   <input type="hidden" name="_method" value="delete">
   <% @memos.each do |r| %>
+    <% @id = r['id'] %>
     <h2><%= r['title'] %></h2>
-    <p><%= r['content'].gsub(/\r/, '<br>') %></p>
+    <p><%= r['content'] %></p>
   <% end %>
 
   <div class="btn-area">
