@@ -84,7 +84,7 @@ end
 get '/memos/:id' do
   @id = params[:id]
   Memo.db do
-    @memos = Memo.fetch(@id)
+    @memo = Memo.fetch(@id).first
   end
   erb :details
 end
@@ -100,9 +100,7 @@ end
 get '/memos/:id/edit' do
   id = params[:id]
   Memo.db do
-    memos = Memo.fetch(id)
-    @title = memos.first['title']
-    @content = memos.first['content']
+    @memo = Memo.fetch(id).first
   end
   erb :edit
 end

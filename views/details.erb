@@ -1,10 +1,7 @@
 <form method="post" action="<%= @id %>/delete">
   <input type="hidden" name="_method" value="delete">
-  <% @memos.each do |r| %>
-    <% @id = r['id'] %>
-    <h2><%= r['title'] %></h2>
-    <p><%= r['content'] %></p>
-  <% end %>
+    <h2><%= @memo['title'] %></h2>
+    <p><%= @memo['content'] %></p>
 
   <div class="btn-area">
     <input type="reset" value="編集" onclick="location.href='<%= @id %>/edit'"><input type="submit" value="削除">
