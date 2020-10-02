@@ -5,42 +5,55 @@ require 'sinatra/reloader'
 require 'json'
 require 'securerandom'
 require 'date'
+require 'pg'
+require 'dotenv/load'
 
 class Memo
-  def initialize(new_json)
-    @new_json = new_json
-  end
-  
-  # jsonファイルを読み込む
-  def self.read
-    open('memos/memos.json') do |f|
-      JSON.load(f)
-    end
-  end
-
-  # jsonファイルを書き込む
-  def self.write
-    File.open('memos/memos.json', 'w') do |f|
-      JSON.dump(@new_json, f)
-    end
+  # DBに接続する
+  def self.connect_db
+    @connection = PG.connect(
+      host: ENV['DB_HOST'],
+      user: ENV['DB_USER'],
+      password: ENV['DB_PASSWORD'],
+      dbname: ENV['DB_NAME']
+    )
   end
 
-  # 空のjsonデータをセットする
-  def self.empty_add
-    @new_json = { 'memos' => [] }
+  # ブロックを利用してDBに接続・接続解除する
+  def self.db(&block)
+    connect_db
+    yield block
+    disconnect_db
   end
 
-  # 追加を反映させたjsonデータをセットする
-  def self.fetch_add(id, title, content, time_str, old_json)
-    add_memo = { id: id, title: title, content: content, update: time_str.to_i }
-    ary_memo = old_json['memos'].push(add_memo)
-    @new_json = { 'memos' => ary_memo }
+  # Memosテーブルを検索し更新時間順に並べる
+  def self.all
+    @connection.exec('SELECT id, title FROM Memos ORDER BY update_at DESC;')
   end
 
-  # 削除を反映させたjsonデータをセットする
-  def self.fetch_delete(id, old_json)
-    del_ary = old_json['memos'].delete_if { |a| a['id'] == id.to_i }
-    @new_json = { 'memos' => del_ary }
+  # idが一致する行を検索する
+  def self.fetch(id)
+    @connection.exec("SELECT id, title, content FROM Memos WHERE id=$1;", [id])
+  end
+
+  # 新しいデータを追加する
+  def self.insert(title, content)
+    @connection.exec("INSERT INTO Memos (title, content, update_at) VALUES ($1, $2, current_timestamp);", [title, content])
+  end
+
+  # データを更新する
+  def self.update(id, title, content)
+    @connection.exec("UPDATE Memos SET title=$1, content=$2, update_at = current_timestamp WHERE id=$3;", [title, content, id])
+  end
+
+  # idが一致する行を削除する
+  def self.delete(id)
+    @connection.exec("DELETE FROM Memos WHERE id=$1;", [id])
+  end
+
+  # DBとの接続を解除する
+  def self.disconnect_db
+    @connection.finish
   end
 end
 
@@ -49,12 +62,9 @@ get '/' do
 end
 
 get '/memos/?' do
-  # 保存用のjsonファイルが存在しなければファイルを作成する
-  unless File.exist?('memos/memos.json')
-    Memo.empty_add
-    Memo.write
+  Memo.db do
+    @memos = Memo.all
   end
-  @json_data = Memo.read
   erb :memos
 end
 
@@ -63,57 +73,44 @@ get '/new' do
 end
 
 post '/memos' do
-  old_json = Memo.read
-  id = SecureRandom.random_number(999999999)
   title = params[:memo_title]
   content = params[:memo_content]
-  time_str = Time.now.strftime('%Y%m%d%H%M%S')
-  Memo.fetch_add(id, title, content, time_str, old_json)
-  Memo.write
-
+  Memo.db do
+    Memo.insert(title, content)
+  end
   redirect '/memos'
 end
 
 get '/memos/:id' do
-  @id = params[:id].delete(':')
-  @json_data = Memo.read
+  @id = params[:id]
+  Memo.db do
+    @memo = Memo.fetch(@id).first
+  end
   erb :details
 end
 
 delete '/memos/:id/delete' do
-  id = params[:id].delete(':')
-  old_json = Memo.read
-  Memo.fetch_delete(id, old_json)
-  Memo.write
-
+  id = params[:id]
+  Memo.db do
+    Memo.delete(id)
+  end
   redirect '/memos'
 end
 
 get '/memos/:id/edit' do
-  id = params[:id].delete(':')
-  json_data = Memo.read
-  json_data['memos'].each do |js|
-    if js['id'] == id.to_i
-      @title = js['title']
-      @content = js['content']
-    end
+  id = params[:id]
+  Memo.db do
+    @memo = Memo.fetch(id).first
   end
   erb :edit
 end
 
 patch '/memos/:id/edit' do
-  id = params[:id].delete(':')
-  old_json = Memo.read
-  Memo.fetch_delete(id, old_json)
-  Memo.write
-
-  old_json = Memo.read
-  id = SecureRandom.random_number(999999999)
+  id = params[:id]
   title = params[:memo_title]
   content = params[:memo_content]
-  time_str = Time.now.strftime('%Y%m%d%H%M%S')
-  Memo.fetch_add(id, title, content, time_str, old_json)
-  Memo.write
-
+  Memo.db do
+    Memo.update(id, title, content)
+  end
   redirect '/memos'
 end

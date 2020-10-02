@@ -1,14 +1,15 @@
 <form method="post" action="memos"> 
   <div class="item">
     <label class="label">タイトル</label>
-    <input class="inputs" type="text" name="memo_title">
+    <input class="inputs" type="text" name="memo_title" required="required">
   </div>
   <div class="item">
     <label class="label">内容</label>
     <textarea class="inputs" name="memo_content"></textarea>
   </div>
 
-  <div class="btn-area">
-    <input type="submit" value="保存"><input type="reset" value="キャンセル" onclick="location.href='memos'">
-  </div>
+<div class="btn-area">
+  <input type="submit" value="保存">
 </form>
+<a href='/memos'>キャンセル</a>
+</div>

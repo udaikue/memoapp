@@ -2,14 +2,15 @@
   <input type="hidden" name="_method" value="patch">
   <div class="item">
     <label class="label">タイトル</label>
-    <input class="inputs" type="text" name="memo_title" value=<%= @title %>>
+    <input class="inputs" type="text" name="memo_title" required="required" value=<%= @memo['title'] %>>
   </div>
   <div class="item">
     <label class="label">内容</label>
-    <textarea class="inputs" name="memo_content"><%= @content %></textarea>
+    <textarea class="inputs" name="memo_content"><%= @memo['content'] %></textarea>
   </div>
 
   <div class="btn-area">
-    <input type="submit" value="保存"><input type="submit" value="キャンセル" onclick="location.href='memos'">
-  </div>
+    <input type="submit" value="保存">
 </form>
+<a href='/memos'>キャンセル</a>
+  </div>
