@@ -33,22 +33,22 @@ class Memo
 
   # idが一致する行を検索する
   def self.fetch(id)
-    @connection.exec("SELECT id, title, content FROM Memos WHERE id = #{id};")
+    @connection.exec("SELECT id, title, content FROM Memos WHERE id=$1;", [id])
   end
 
   # 新しいデータを追加する
   def self.insert(title, content)
-    @connection.exec("INSERT INTO Memos (title, content, update_at) VALUES ('#{title}', '#{content}', current_timestamp);")
+    @connection.exec("INSERT INTO Memos (title, content, update_at) VALUES ($1, $2, current_timestamp);", [title, content])
   end
 
   # データを更新する
   def self.update(id, title, content)
-    @connection.exec("UPDATE Memos SET title = '#{title}', content = '#{content}', update_at = current_timestamp WHERE id = #{id};")
+    @connection.exec("UPDATE Memos SET title=$1, content=$2, update_at = current_timestamp WHERE id=$3;", [title, content, id])
   end
 
   # idが一致する行を削除する
   def self.delete(id)
-    @connection.exec("DELETE FROM Memos WHERE id = #{id};")
+    @connection.exec("DELETE FROM Memos WHERE id=$1;", [id])
   end
 
   # DBとの接続を解除する
